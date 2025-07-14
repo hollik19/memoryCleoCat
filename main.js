@@ -411,7 +411,7 @@ class Main {
         }
     }
 
-    pause() {
+    function pause() {
         // Pause audio
         if (audioManager) {
             audioManager.stopMusic();
@@ -434,7 +434,7 @@ class Main {
         console.log('⏸️ Game paused');
     }
 
-    resume() {
+    function resume() {
         // Resume audio based on current screen
         if (audioManager && game) {
             switch (game.currentScreen) {
