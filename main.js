@@ -922,7 +922,7 @@ class Main {
 const main = new Main();
 
 // Start the game when the page loads
-function if(document.readyState === 'loading') {
+if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => main.init());
 } else {
     main.init();
@@ -968,7 +968,7 @@ console.log('🎮 Use Ctrl+Shift+D for debug mode');
 console.log('🔧 Use Ctrl+Shift+R for error recovery');
 
 // Service worker registration for offline play (if available)
-function if('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
             .then(registration => {
