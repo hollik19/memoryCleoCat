@@ -2,6 +2,7 @@
 
 class Game {
     constructor() {
+        this.isProcessingJoker = false;
         this.currentScreen = 'title';
         this.gridSize = 3;
         this.cards = [];
@@ -240,7 +241,7 @@ class Game {
         const card = this.cards[cardIndex];
         const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
         
-        if (!card || card.isFlipped || card.isMatched || this.flippedCards.length >= 2) {
+        if (!card || card.isFlipped || card.isMatched || this.flippedCards.length >= 2 || this.isProcessingJoker) {
             return;
         }
         
@@ -270,6 +271,7 @@ class Game {
     }
 
     handleJokerFlip(jokerIndex) {
+        this.isProcessingJoker = true;  // ADD THIS LINE
         const jokerCard = this.cards[jokerIndex];
         
         // Find matching pair for the joker
@@ -375,6 +377,7 @@ class Game {
                 this.endGame();
             }, 1000);
         }
+        this.isProcessingJoker = false;
         // Player keeps their turn on a match
     }
 
