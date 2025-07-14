@@ -56,13 +56,18 @@ class Game {
         console.log('🏠 Showing title screen');
     }
 
-    showGridSelection() {
-        this.currentScreen = 'gridSelection';
-        Utils.showScreen('grid-selection');
-        
-        if (audioManager) {
-            audioManager.playSound('buttonClick');
-        }
+showGridSelection() {
+    this.currentScreen = 'gridSelection';
+    
+    // Direct screen switching - bypass Utils.showScreen()
+    const titleScreen = document.getElementById('title-screen');
+    const gridScreen = document.getElementById('grid-selection');
+    
+    if (titleScreen) titleScreen.classList.remove('active');
+    if (gridScreen) gridScreen.classList.add('active');
+    
+    audioManager.playSound('buttonClick');
+}
         
         console.log('📐 Showing grid selection');
     }
