@@ -1,4 +1,4 @@
-// Game.js Part 1 - Constructor and Basic Setup
+// Game.js - Core game logic and state management
 
 class Game {
     constructor() {
@@ -18,106 +18,61 @@ class Game {
             moves: 0,
             perfectMoves: 0,
             startTime: null,
-            mistakes: 0,
-            peekUsed: 0,
-            mathProblemsCorrect: 0,
-            mathProblemsTotal: 0,
-            gameWins: { player1: 0, player2: 0 }
+            mistakes: 0
         };
-        this.gameHistory = [];
-        this.currentMathProblem = null;
-        this.selectedAnswer = null;
-        this.peekCooldown = false;
-        this.peekCooldownTime = 5000;
-        this.peekCooldownTimer = null;
         this.init();
     }
 
     init() {
-        console.log('🎮 Initializing Cat Memory Game');
         this.loadAchievements();
-        this.loadGameHistory();
         this.showTitle();
     }
 
-    // Screen Management
     showTitle() {
         this.currentScreen = 'title';
         Utils.showScreen('title-screen');
-        
-        if (audioManager) {
-            audioManager.startMusic('title');
-        }
-        
-        if (graphics) {
-            graphics.cleanup();
-        }
-        
-        console.log('🏠 Showing title screen');
+        audioManager.startMusic('title');
+        graphics.cleanup();
     }
 
-showGridSelection() {
-    this.currentScreen = 'gridSelection';
-    Utils.showScreen('grid-selection');
-    audioManager.playSound('buttonClick');
-}
+    showGridSelection() {
+        this.currentScreen = 'gridSelection';
+        Utils.showScreen('grid-selection');
+        audioManager.playSound('buttonClick');
+    }
 
     showGame() {
         this.currentScreen = 'game';
         Utils.showScreen('game-screen');
-        this.updatePeekButton();
     }
 
     showPeekChallenge() {
-        if (this.peekCooldown) {
-            Utils.showNotification('Peek is on cooldown!', 'info', 2000);
-            return;
-        }
-        
         this.currentScreen = 'peek';
         this.generateMathProblem();
-        this.clearSelectedAnswer();
         Utils.showScreen('peek-screen');
-        
-        if (audioManager) {
-            audioManager.playSound('peek');
-        }
-        
-        console.log('🧮 Showing peek challenge');
+        audioManager.playSound('peek');
     }
 
     showAchievements() {
         this.currentScreen = 'achievements';
         this.displayAchievements();
         Utils.showScreen('achievements-screen');
-        
-        if (audioManager) {
-            audioManager.playSound('buttonClick');
-        }
-        
-        console.log('🏆 Showing achievements');
+        audioManager.playSound('buttonClick');
     }
 
     showGameOver() {
         this.currentScreen = 'gameOver';
         this.displayGameOverScreen();
         Utils.showScreen('gameover-screen');
+        audioManager.stopMusic();
         
-        if (audioManager) {
-            audioManager.stopMusic();
-        }
-        
-        this.saveGameToHistory();
-        
-        if (Math.random() < Utils.getGameConfig().minigameProbability) {
+        // Check for minigame trigger (5% chance)
+        if (Math.random() < 0.05) {
             setTimeout(() => {
                 this.triggerMinigame();
-            }, 3000);
+            }, 2000);
         }
-        
-        console.log('🎉 Game over');
     }
-// Game.js Part 2 - Game Setup and Card Creation
 
     startGame(size) {
         this.gridSize = size;
@@ -126,13 +81,8 @@ showGridSelection() {
         this.renderGameBoard();
         this.showGame();
         this.gameStats.startTime = Date.now();
-        
-        if (audioManager) {
-            audioManager.startMusic('game');
-            audioManager.playSound('buttonClick');
-        }
-        
-        console.log(`🎮 Starting ${size}x${size} game`);
+        audioManager.startMusic('game');
+        audioManager.playSound('buttonClick');
     }
 
     resetGame() {
@@ -143,50 +93,58 @@ showGridSelection() {
         this.scores = { player1: 0, player2: 0 };
         this.catPosition = { x: 0, y: 0 };
         this.jokers = [];
-        this.selectedAnswer = null;
-        this.peekCooldown = false;
-        
-        if (this.peekCooldownTimer) {
-            clearTimeout(this.peekCooldownTimer);
-            this.peekCooldownTimer = null;
-        }
-        
         this.gameStats = {
             moves: 0,
             perfectMoves: 0,
             startTime: Date.now(),
-            mistakes: 0,
-            peekUsed: 0,
-            mathProblemsCorrect: 0,
-            mathProblemsTotal: 0,
-            gameWins: this.gameStats.gameWins
+            mistakes: 0
         };
         
         this.updateScoreDisplay();
         this.updateCurrentPlayerDisplay();
-        this.updatePeekButton();
-        
-        console.log('🔄 Game reset');
     }
 
     createCards() {
-        const config = Utils.getGameConfig().jokerConfig[this.gridSize];
+        const totalCards = this.gridSize * this.gridSize;
         const symbols = Utils.getCardSymbols();
         const jokerSymbol = Utils.getJokerSymbol();
         
-        this.totalPairs = config.pairs;
-        const numJokers = config.jokers;
+        // Determine number of pairs and jokers based on grid size
+        let pairs, numJokers;
+        switch (this.gridSize) {
+            case 3: // 9 cards: 4 pairs + 1 joker
+                pairs = 4;
+                numJokers = 1;
+                break;
+            case 4: // 16 cards: 8 pairs (no jokers)
+                pairs = 8;
+                numJokers = 0;
+                break;
+            case 5: // 25 cards: 12 pairs + 1 joker  
+                pairs = 12;
+                numJokers = 1;
+                break;
+            case 6: // 36 cards: 16 pairs + 4 jokers
+                pairs = 16;
+                numJokers = 4;
+                break;
+        }
         
+        this.totalPairs = pairs;
+        
+        // Create pairs
         const cardSymbols = [];
-        for (let i = 0; i < this.totalPairs; i++) {
+        for (let i = 0; i < pairs; i++) {
             const symbol = symbols[i % symbols.length];
             cardSymbols.push(symbol, symbol);
         }
         
+        // Add jokers
         for (let i = 0; i < numJokers; i++) {
             cardSymbols.push(jokerSymbol);
         }
         
+        // Shuffle and create card objects
         const shuffledSymbols = Utils.shuffleArray(cardSymbols);
         this.cards = shuffledSymbols.map((symbol, index) => ({
             id: index,
@@ -196,18 +154,12 @@ showGridSelection() {
             isJoker: symbol === jokerSymbol
         }));
         
+        // Track joker positions
         this.jokers = this.cards.filter(card => card.isJoker).map(card => card.id);
-        
-        console.log(`🃏 Created ${cardSymbols.length} cards (${this.totalPairs} pairs, ${numJokers} jokers)`);
     }
 
     renderGameBoard() {
         this.gameBoard = document.getElementById('game-board');
-        if (!this.gameBoard) {
-            console.error('Game board element not found');
-            return;
-        }
-        
         this.gameBoard.innerHTML = '';
         this.gameBoard.className = `game-board grid-${this.gridSize}x${this.gridSize}`;
         
@@ -215,36 +167,27 @@ showGridSelection() {
             const cardElement = Utils.createElement('div', 'card');
             cardElement.dataset.index = index;
             cardElement.dataset.symbol = card.symbol;
-            cardElement.setAttribute('tabindex', '0');
-            cardElement.setAttribute('role', 'button');
-            cardElement.setAttribute('aria-label', `Card ${index + 1}`);
             
             if (card.isJoker) {
                 cardElement.classList.add('joker');
             }
             
-            cardElement.addEventListener('keydown', (e) => {
-                if (e.code === 'Enter' || e.code === 'Space') {
-                    e.preventDefault();
-                    this.selectCard(index);
-                }
-            });
-            
             this.gameBoard.appendChild(cardElement);
         });
         
+        // Highlight initial cat position
         this.updateCatPosition();
-        console.log('🎯 Game board rendered');
     }
-// Game.js Part 3 - Cat Movement and Card Logic
 
     updateCatPosition() {
+        // Remove current position highlight
         document.querySelectorAll('.card').forEach(card => {
             card.classList.remove('current-position');
         });
         
+        // Add highlight to current position
         const currentCard = this.getCurrentCard();
-        if (currentCard && graphics) {
+        if (currentCard) {
             graphics.highlightCurrentCard(currentCard);
         }
     }
@@ -272,19 +215,16 @@ showGridSelection() {
                 break;
         }
         
+        // Only update if position changed
         if (oldPos.x !== this.catPosition.x || oldPos.y !== this.catPosition.y) {
             this.updateCatPosition();
+            audioManager.playSound('buttonClick');
             
-            if (audioManager) {
-                audioManager.playSound('buttonClick');
-            }
-            
+            // Animate cat sprite
             const catSprite = document.getElementById('cat-sprite');
-            if (catSprite && graphics) {
+            if (catSprite) {
                 graphics.animateCatMovement(catSprite, direction);
             }
-            
-            Utils.vibrate([30]);
         }
     }
 
@@ -300,27 +240,20 @@ showGridSelection() {
         const card = this.cards[cardIndex];
         const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
         
-        if (!card || !cardElement || card.isFlipped || card.isMatched || this.flippedCards.length >= 2) {
-            if (audioManager) {
-                audioManager.playSound('catDisappoint');
-            }
+        if (!card || card.isFlipped || card.isMatched || this.flippedCards.length >= 2) {
             return;
         }
         
+        // Flip the card
         card.isFlipped = true;
         this.flippedCards.push(cardIndex);
         this.gameStats.moves++;
         
-        if (graphics) {
-            graphics.animateCardFlip(cardElement, true);
-        }
+        // Animate card flip
+        graphics.animateCardFlip(cardElement, true);
+        audioManager.playSound('cardFlip');
         
-        if (audioManager) {
-            audioManager.playSound('cardFlip');
-        }
-        
-        Utils.vibrate([50]);
-        
+        // Handle joker
         if (card.isJoker) {
             setTimeout(() => {
                 this.handleJokerFlip(cardIndex);
@@ -328,20 +261,23 @@ showGridSelection() {
             return;
         }
         
+        // Check for match after second card
         if (this.flippedCards.length === 2) {
             setTimeout(() => {
                 this.checkForMatch();
             }, 500);
         }
-        
-        console.log(`🃏 Card ${cardIndex} flipped`);
     }
 
     handleJokerFlip(jokerIndex) {
+        const jokerCard = this.cards[jokerIndex];
+        
+        // Find matching pair for the joker
         const otherCards = this.cards.filter((card, index) => 
             !card.isMatched && !card.isJoker && index !== jokerIndex
         );
         
+        // Group by symbol
         const symbolGroups = {};
         otherCards.forEach(card => {
             if (!symbolGroups[card.symbol]) {
@@ -350,28 +286,28 @@ showGridSelection() {
             symbolGroups[card.symbol].push(card);
         });
         
+        // Find a complete pair
         const completePair = Object.values(symbolGroups).find(group => group.length >= 2);
         
         if (completePair) {
+            // Auto-reveal the matching pair
             const pair = completePair.slice(0, 2);
             const matchedCards = [jokerIndex, ...pair.map(card => card.id)];
             
+            // Flip the pair cards
             pair.forEach(card => {
                 card.isFlipped = true;
                 const element = document.querySelector(`[data-index="${card.id}"]`);
-                if (element && graphics) {
-                    graphics.animateCardFlip(element, true);
-                }
+                graphics.animateCardFlip(element, true);
             });
             
             setTimeout(() => {
                 this.handleMatch(matchedCards, true);
             }, 500);
         } else {
+            // No pairs available, treat as normal card
             this.checkForMatch();
         }
-        
-        console.log('⭐ Joker revealed');
     }
 
     checkForMatch() {
@@ -382,102 +318,97 @@ showGridSelection() {
         const card2 = this.cards[index2];
         
         if (card1.symbol === card2.symbol) {
+            // Match found
             this.handleMatch([index1, index2]);
         } else {
+            // No match
             this.handleMismatch([index1, index2]);
         }
     }
-// Game.js Part 4 - Match Handling and Math System
 
     handleMatch(cardIndices, isJokerMatch = false) {
+        // Mark cards as matched
         cardIndices.forEach(index => {
             this.cards[index].isMatched = true;
         });
         
+        // Update score
         this.scores[`player${this.currentPlayer}`]++;
         this.gameStats.perfectMoves++;
         
+        // Animate matched cards
         const cardElements = cardIndices.map(index => 
             document.querySelector(`[data-index="${index}"]`)
-        ).filter(el => el);
+        );
         
-        if (graphics) {
-            if (isJokerMatch) {
-                graphics.animateJokerReveal(cardElements);
-            } else {
-                graphics.animateCardMatch(cardElements);
-            }
+        if (isJokerMatch) {
+            graphics.animateJokerReveal(cardElements);
+        } else {
+            graphics.animateCardMatch(cardElements);
         }
         
-        if (audioManager) {
-            audioManager.playSound('cardMatch');
-            audioManager.playSound('catPurr');
-        }
+        // Play sound and create effects
+        audioManager.playSound('cardMatch');
+        audioManager.playSound('catPurr');
         
+        // Create particle effects
         cardElements.forEach(element => {
             const rect = element.getBoundingClientRect();
-            if (graphics) {
-                graphics.createParticleBurst(
-                    rect.left + rect.width / 2,
-                    rect.top + rect.height / 2,
-                    8,
-                    { 
-                        color: isJokerMatch ? '#ffd700' : '#00b894',
-                        shape: isJokerMatch ? 'star' : 'circle'
-                    }
-                );
-            }
+            graphics.createParticleBurst(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+                8,
+                { color: isJokerMatch ? '#ffd700' : '#00b894' }
+            );
         });
         
+        // Update display
         this.updateScoreDisplay();
+        
+        // Clear flipped cards
         this.flippedCards = [];
         this.matchedPairs++;
         
-        Utils.vibrate([100, 50, 100]);
-        
+        // Check for game end
         if (this.isGameComplete()) {
             setTimeout(() => {
                 this.endGame();
             }, 1000);
         }
-        
-        console.log(`✅ Match found! Player ${this.currentPlayer} scores`);
+        // Player keeps their turn on a match
     }
 
     handleMismatch(cardIndices) {
         setTimeout(() => {
+            // Flip cards back
             cardIndices.forEach(index => {
                 const card = this.cards[index];
                 const cardElement = document.querySelector(`[data-index="${index}"]`);
                 
-                if (card && cardElement) {
-                    card.isFlipped = false;
-                    cardElement.textContent = '';
-                    cardElement.classList.remove('flipped');
-                }
+                card.isFlipped = false;
+                cardElement.textContent = '';
+                cardElement.classList.remove('flipped');
             });
             
+            // Animate mismatch
             const cardElements = cardIndices.map(index => 
                 document.querySelector(`[data-index="${index}"]`)
-            ).filter(el => el);
+            );
+            graphics.animateCardMiss(cardElements);
             
-            if (graphics) {
-                graphics.animateCardMiss(cardElements);
-            }
+            // Play sounds
+            audioManager.playSound('cardMiss');
+            audioManager.playSound('catDisappoint');
             
-            if (audioManager) {
-                audioManager.playSound('cardMiss');
-                audioManager.playSound('catDisappoint');
-            }
-            
+            // Update stats
             this.gameStats.mistakes++;
-            this.switchPlayer();
-            this.flippedCards = [];
             
-            Utils.vibrate([200]);
+            // Switch players
+            this.switchPlayer();
+            
+            // Clear flipped cards
+            this.flippedCards = [];
         }, 1000);
-        
-        console.log('❌ No match - switching players');
     }
 
     switchPlayer() {
@@ -489,10 +420,10 @@ showGridSelection() {
         const score1Element = document.getElementById('player1-score');
         const score2Element = document.getElementById('player2-score');
         
-        if (score1Element && graphics) {
+        if (score1Element) {
             graphics.animateScoreIncrement(score1Element, this.scores.player1);
         }
-        if (score2Element && graphics) {
+        if (score2Element) {
             graphics.animateScoreIncrement(score2Element, this.scores.player2);
         }
     }
@@ -505,237 +436,94 @@ showGridSelection() {
         }
     }
 
-    updatePeekButton() {
-        const peekButton = document.getElementById('peek-button');
-        if (peekButton) {
-            if (this.peekCooldown) {
-                peekButton.disabled = true;
-                peekButton.style.opacity = '0.5';
-                peekButton.textContent = '🧮 PEEK (Cooldown)';
-            } else {
-                peekButton.disabled = false;
-                peekButton.style.opacity = '1';
-                peekButton.textContent = '🧮 PEEK (Math)';
-            }
-        }
-    }
-
-    generateMathProblem() {
-        this.currentMathProblem = Utils.generateMathProblem();
-        this.gameStats.mathProblemsTotal++;
-        
-        const questionElement = document.getElementById('math-question');
-        if (questionElement) {
-            questionElement.textContent = `${this.currentMathProblem.question} = ?`;
-        }
-        
-        console.log(`🧮 Math problem: ${this.currentMathProblem.question} = ${this.currentMathProblem.answer}`);
-    }
-
-    inputNumber(number) {
-        this.selectedAnswer = number;
-        
-        const displayElement = document.getElementById('answer-display');
-        if (displayElement) {
-            displayElement.textContent = number;
-            displayElement.style.color = '#74b9ff';
-        }
-        
-        if (audioManager) {
-            audioManager.playSound('numberInput');
-        }
-        
-        Utils.vibrate([30]);
-        console.log(`🔢 Number selected: ${number}`);
-    }
-
-    clearNumber() {
-        this.selectedAnswer = null;
-        
-        const displayElement = document.getElementById('answer-display');
-        if (displayElement) {
-            displayElement.textContent = '_';
-            displayElement.style.color = '';
-        }
-        
-        if (audioManager) {
-            audioManager.playSound('buttonClick');
-        }
-        
-        console.log('🔢 Number cleared');
-    }
-
-    clearSelectedAnswer() {
-        this.clearNumber();
-    }
-// Game.js Part 5 - Peek System and Game End
-
-    submitMathAnswer() {
-        if (this.selectedAnswer === null || !this.currentMathProblem) {
-            Utils.showNotification('Please select an answer first!', 'info', 2000);
-            return;
-        }
-        
-        const isCorrect = this.selectedAnswer === this.currentMathProblem.answer;
-        
-        if (isCorrect) {
-            this.gameStats.mathProblemsCorrect++;
-            
-            if (audioManager) {
-                audioManager.playSound('mathCorrect');
-            }
-            
-            Utils.showNotification('Correct! Peek activated!', 'success', 2000);
-            this.activatePeekMode();
-            this.showGame();
-            this.startPeekCooldown();
-            
-            console.log('✅ Math answer correct - peek activated');
-        } else {
-            if (audioManager) {
-                audioManager.playSound('mathWrong');
-            }
-            
-            const questionElement = document.getElementById('math-question');
-            if (questionElement && graphics) {
-                graphics.shakeElement(questionElement);
-                
-                const originalText = questionElement.textContent;
-                questionElement.textContent = `Correct answer: ${this.currentMathProblem.answer}`;
-                questionElement.style.color = '#ff6b6b';
-                
-                setTimeout(() => {
-                    questionElement.textContent = originalText;
-                    questionElement.style.color = '';
-                    this.showGame();
-                }, 2000);
-            }
-            
-            Utils.showNotification('Wrong answer! Try again next time.', 'error', 2000);
-            Utils.vibrate([200, 100, 200]);
-            
-            console.log('❌ Math answer incorrect');
-        }
-    }
-
-    activatePeekMode() {
-        const cards = document.querySelectorAll('.card');
-        const duration = Utils.getGameConfig().peekDuration;
-        
-        this.gameStats.peekUsed++;
-        
-        if (graphics) {
-            graphics.animatePeekMode(cards, duration);
-            graphics.createFloatingText(
-                window.innerWidth / 2,
-                150,
-                'PEEK MODE ACTIVATED!',
-                '#74b9ff',
-                { duration: 2000, fontSize: '28px' }
-            );
-        }
-        
-        console.log('👁️ Peek mode activated');
-    }
-
-    startPeekCooldown() {
-        this.peekCooldown = true;
-        this.updatePeekButton();
-        
-        this.peekCooldownTimer = setTimeout(() => {
-            this.peekCooldown = false;
-            this.updatePeekButton();
-            
-            if (this.currentScreen === 'game') {
-                Utils.showNotification('Peek is ready again!', 'info', 1500);
-            }
-        }, this.peekCooldownTime);
-    }
-
     isGameComplete() {
         return this.matchedPairs >= this.totalPairs;
     }
 
     endGame() {
+        // Calculate final stats
         const gameTime = Date.now() - this.gameStats.startTime;
-        const winner = this.getWinner();
         
-        if (winner > 0) {
-            this.gameStats.gameWins[`player${winner}`]++;
-        }
+        // Check achievements
+        this.checkGameAchievements();
         
-        this.checkGameAchievements(gameTime, winner);
+        // Show game over screen
         this.showGameOver();
-        
-        console.log(`🎉 Game ended - Winner: Player ${winner || 'Tie'}`);
     }
 
-    getWinner() {
-        if (this.scores.player1 > this.scores.player2) return 1;
-        if (this.scores.player2 > this.scores.player1) return 2;
-        return 0;
-    }
-
-    checkGameAchievements(gameTime, winner) {
-        const gameTimeSeconds = gameTime / 1000;
-        
+    checkGameAchievements() {
+        // Purr-fect Memory - Complete game with zero mistakes
         if (this.gameStats.mistakes === 0) {
             this.unlockAchievement("Purr-fect Memory", "Complete a game without any mistakes!");
         }
         
+        // Cat Burglar - Win from behind by 3+ points
         const scoreDiff = Math.abs(this.scores.player1 - this.scores.player2);
         if (scoreDiff >= 3) {
             this.unlockAchievement("Cat Burglar", "Win a game by 3 or more points!");
         }
         
+        // Nine Lives - Dramatic comeback (specific logic needed)
+        // This would require tracking score during game
+        
+        // Speed achievements based on grid size and time
+        const gameTimeSeconds = (Date.now() - this.gameStats.startTime) / 1000;
         if (this.gridSize === 6 && gameTimeSeconds < 120) {
             this.unlockAchievement("Lightning Cat", "Complete 6x6 grid in under 2 minutes!");
         }
-        
-        if (this.gameStats.mathProblemsCorrect >= 3) {
-            this.unlockAchievement("Math Wizard", "Solve 3+ math problems correctly in one game!");
+    }
+
+    unlockAchievement(name, description) {
+        if (!this.achievements[name]) {
+            this.achievements[name] = {
+                name: name,
+                description: description,
+                unlocked: true,
+                timestamp: Date.now()
+            };
+            
+            this.saveAchievements();
+            audioManager.playSound('achievementUnlock');
+            
+            // Show achievement notification
+            graphics.createFloatingText(
+                window.innerWidth / 2,
+                100,
+                `Achievement Unlocked: ${name}!`,
+                '#ffd700'
+            );
         }
-        
-        if (winner > 0 && scoreDiff >= 2 && this.gameStats.mistakes >= 3) {
-            this.unlockAchievement("Nine Lives", "Make a dramatic comeback victory!");
-        }
-        
-        console.log('🏆 Achievements checked');
     }
 
     displayGameOverScreen() {
-        const winner = this.getWinner();
+        const winner = this.scores.player1 > this.scores.player2 ? 1 : 
+                     this.scores.player2 > this.scores.player1 ? 2 : 0;
         
         const winnerText = document.getElementById('winner-text');
         const score1 = document.getElementById('final-score1');
         const score2 = document.getElementById('final-score2');
         
-        if (winnerText) {
-            if (winner === 0) {
-                winnerText.textContent = "It's a Tie! 🤝";
-                winnerText.style.color = '#ffd700';
-            } else {
-                winnerText.textContent = `Player ${winner} Wins! 🎉`;
-                if (graphics) {
-                    graphics.animateGameOver(winnerText, winner === 1);
-                }
-            }
+        if (winner === 0) {
+            winnerText.textContent = "It's a Tie!";
+            winnerText.style.color = '#ffd700';
+        } else {
+            winnerText.textContent = `Player ${winner} Wins!`;
+            graphics.animateGameOver(winnerText, winner === 1);
         }
         
         if (score1) score1.textContent = this.scores.player1;
         if (score2) score2.textContent = this.scores.player2;
         
-        if (audioManager) {
-            if (winner === 0) {
-                audioManager.playSound('catPurr');
-            } else {
-                audioManager.playSound('gameWin');
-            }
+        // Play appropriate sound
+        if (winner === 0) {
+            audioManager.playSound('catPurr');
+        } else {
+            audioManager.playSound('gameWin');
         }
         
+        // Show earned achievements
         this.displayNewAchievements();
     }
-// Game.js Part 6 - Achievements and Data Management (Complete)
 
     displayNewAchievements() {
         const container = document.getElementById('achievements-earned');
@@ -743,6 +531,7 @@ showGridSelection() {
         
         container.innerHTML = '';
         
+        // Show recently unlocked achievements (last 5 minutes)
         const recentTime = Date.now() - 5 * 60 * 1000;
         const recentAchievements = Object.values(this.achievements)
             .filter(achievement => achievement.timestamp > recentTime);
@@ -760,10 +549,7 @@ showGridSelection() {
                     <p>${achievement.description}</p>
                 `;
                 container.appendChild(achievementElement);
-                
-                if (graphics) {
-                    graphics.animateAchievementUnlock(achievementElement);
-                }
+                graphics.animateAchievementUnlock(achievementElement);
             });
         }
     }
@@ -774,7 +560,15 @@ showGridSelection() {
         
         container.innerHTML = '';
         
-        const allAchievements = Utils.getGameConfig().achievements;
+        const allAchievements = {
+            "Purr-fect Memory": "Complete a game without any mistakes",
+            "Cat Burglar": "Win a game by 3 or more points",
+            "Nine Lives": "Make a dramatic comeback victory",
+            "Speed Hunter": "Achieve high score in mouse hunt",
+            "Golden Hunter": "Catch the rare golden mouse",
+            "Mouse Master": "Catch all mice in minigame",
+            "Lightning Cat": "Complete 6x6 grid in under 2 minutes"
+        };
         
         Object.entries(allAchievements).forEach(([name, description]) => {
             const achievement = this.achievements[name];
@@ -784,78 +578,87 @@ showGridSelection() {
             achievementElement.innerHTML = `
                 <h4>${achievement ? '🏆' : '🔒'} ${name}</h4>
                 <p>${description}</p>
-                ${achievement ? `<small>Unlocked: ${Utils.formatTimestamp(achievement.timestamp)}</small>` : ''}
+                ${achievement ? `<small>Unlocked: ${new Date(achievement.timestamp).toLocaleDateString()}</small>` : ''}
             `;
             
             container.appendChild(achievementElement);
         });
     }
 
-    unlockAchievement(name, description) {
-        if (!this.achievements[name]) {
-            this.achievements[name] = {
-                name: name,
-                description: description,
-                unlocked: true,
-                timestamp: Date.now()
-            };
-            
-            this.saveAchievements();
-            
-            if (audioManager) {
-                audioManager.playSound('achievementUnlock');
-            }
-            
-            if (graphics) {
-                graphics.createFloatingText(
-                    window.innerWidth / 2,
-                    100,
-                    `Achievement Unlocked: ${name}!`,
-                    '#ffd700',
-                    { duration: 3000, fontSize: '20px' }
-                );
-            }
-            
-            Utils.showNotification(`🏆 ${name}`, 'success', 3000);
-            Utils.vibrate([100, 50, 100, 50, 100]);
-            
-            console.log(`🏆 Achievement unlocked: ${name}`);
-        }
-    }
-
     triggerMinigame() {
-        console.log('🐭 Triggering minigame');
         this.currentScreen = 'minigame';
         Utils.showScreen('minigame-screen');
-        
-        Utils.showNotification('Bonus Round: Catch the Mice!', 'success', 2000);
         
         minigame.start().then(() => {
             minigame.startUpdateLoop();
         });
     }
 
-    saveGameToHistory() {
-        const gameRecord = {
-            timestamp: Date.now(),
-            gridSize: this.gridSize,
-            scores: { ...this.scores },
-            winner: this.getWinner(),
-            stats: { ...this.gameStats },
-            duration: Date.now() - this.gameStats.startTime
-        };
-        
-        this.gameHistory.unshift(gameRecord);
-        
-        if (this.gameHistory.length > 50) {
-            this.gameHistory = this.gameHistory.slice(0, 50);
+    // Math challenge methods
+    generateMathProblem() {
+        const problem = Utils.generateMathProblem();
+        const questionElement = document.getElementById('math-question');
+        if (questionElement) {
+            questionElement.textContent = problem.question + ' = ?';
         }
-        
-        Utils.saveToLocalStorage('gameHistory', this.gameHistory);
+        this.currentMathAnswer = problem.answer;
     }
 
-    loadGameHistory() {
-        this.gameHistory = Utils.loadFromLocalStorage('gameHistory', []);
+    inputNumber(number) {
+        const input = document.getElementById('math-answer');
+        if (input) {
+            input.value = number;
+        }
+        audioManager.playSound('buttonClick');
+    }
+
+    clearNumber() {
+        const input = document.getElementById('math-answer');
+        if (input) {
+            input.value = '';
+        }
+        audioManager.playSound('buttonClick');
+    }
+
+    submitMathAnswer() {
+        const input = document.getElementById('math-answer');
+        const userAnswer = parseInt(input.value);
+        
+        if (userAnswer === this.currentMathAnswer) {
+            // Correct answer - show peek mode
+            audioManager.playSound('cardMatch');
+            this.activatePeekMode();
+            this.showGame();
+        } else {
+            // Wrong answer
+            audioManager.playSound('cardMiss');
+            graphics.shakeElement(input);
+            input.value = '';
+            
+            // Show correct answer briefly
+            const questionElement = document.getElementById('math-question');
+            const originalText = questionElement.textContent;
+            questionElement.textContent = `Correct answer: ${this.currentMathAnswer}`;
+            questionElement.style.color = '#ff6b6b';
+            
+            setTimeout(() => {
+                questionElement.textContent = originalText;
+                questionElement.style.color = '';
+                this.showGame();
+            }, 2000);
+        }
+    }
+
+    activatePeekMode() {
+        const cards = document.querySelectorAll('.card');
+        graphics.animatePeekMode(cards, 4000);
+        
+        graphics.createFloatingText(
+            window.innerWidth / 2,
+            150,
+            'PEEK MODE ACTIVATED!',
+            '#74b9ff'
+        );
     }
 
     saveAchievements() {
@@ -865,86 +668,11 @@ showGridSelection() {
     loadAchievements() {
         this.achievements = Utils.loadFromLocalStorage('achievements', {});
     }
-resetAchievements() {
+
+    resetAchievements() {
         this.achievements = {};
         this.saveAchievements();
         console.log('🗑️ All achievements reset');
-    }
-    getGameStats() {
-        const totalGames = this.gameStats.gameWins.player1 + this.gameStats.gameWins.player2;
-        const mathAccuracy = this.gameStats.mathProblemsTotal > 0 ? 
-            (this.gameStats.mathProblemsCorrect / this.gameStats.mathProblemsTotal * 100).toFixed(1) : 0;
-        
-        return {
-            totalGames: totalGames,
-            player1Wins: this.gameStats.gameWins.player1,
-            player2Wins: this.gameStats.gameWins.player2,
-            mathAccuracy: mathAccuracy,
-            achievementsUnlocked: Object.keys(this.achievements).length,
-            totalAchievements: Object.keys(Utils.getGameConfig().achievements).length,
-            averageGameTime: this.calculateAverageGameTime(),
-            favoriteGridSize: this.getFavoriteGridSize()
-        };
-    }
-
-    calculateAverageGameTime() {
-        if (this.gameHistory.length === 0) return 0;
-        
-        const totalTime = this.gameHistory.reduce((sum, game) => sum + game.duration, 0);
-        return Math.round(totalTime / this.gameHistory.length / 1000);
-    }
-
-    getFavoriteGridSize() {
-        if (this.gameHistory.length === 0) return null;
-        
-        const gridCounts = {};
-        this.gameHistory.forEach(game => {
-            gridCounts[game.gridSize] = (gridCounts[game.gridSize] || 0) + 1;
-        });
-        
-        return Object.entries(gridCounts).reduce((a, b) => 
-            gridCounts[a[0]] > gridCounts[b[0]] ? a : b
-        )[0];
-    }
-
-    resetAllData() {
-        this.achievements = {};
-        this.saveAchievements();
-        
-        this.gameHistory = [];
-        Utils.saveToLocalStorage('gameHistory', this.gameHistory);
-        
-        this.resetGame();
-        this.gameStats.gameWins = { player1: 0, player2: 0 };
-        
-        Utils.showNotification('All data reset!', 'info', 2000);
-        console.log('🔄 All game data reset');
-    }
-
-    getStatus() {
-        return {
-            currentScreen: this.currentScreen,
-            gridSize: this.gridSize,
-            currentPlayer: this.currentPlayer,
-            scores: { ...this.scores },
-            matchedPairs: this.matchedPairs,
-            totalPairs: this.totalPairs,
-            flippedCards: this.flippedCards.length,
-            catPosition: { ...this.catPosition },
-            peekCooldown: this.peekCooldown,
-            gameStats: { ...this.gameStats }
-        };
-    }
-
-    cleanup() {
-        if (this.peekCooldownTimer) {
-            clearTimeout(this.peekCooldownTimer);
-        }
-        
-        this.currentScreen = 'title';
-        this.resetGame();
-        
-        console.log('🎮 Game cleaned up');
     }
 }
 
