@@ -172,9 +172,7 @@ class Main {
 
         console.log('⚙️ Device optimization complete:', deviceInfo);
     }
-}
-// Main.js Part 2 - Game Loop and Performance Management
-    update(deltaTime) {
+   update(deltaTime) {
         // Update game systems
         if (game && game.currentScreen === 'game') {
             // Game is running, all updates handled by individual systems
@@ -300,7 +298,11 @@ class Main {
                 game.saveGameToHistory();
             }
             this.lastAutoSave = Date.now();
-        }
+        } 
+}
+
+// Main.js Part 2 - Game Loop and Performance Management
+    
     }
 }
 // Main.js Part 3 - Event Handling and Responsive Design
