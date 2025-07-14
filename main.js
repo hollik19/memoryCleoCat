@@ -363,7 +363,7 @@ class Main {
         }
     }
 
-    handleOrientationChange() {
+    function handleOrientationChange() {
         console.log('📱 Orientation changed');
         
         // Delay handling to let the browser finish the orientation change
@@ -380,7 +380,7 @@ class Main {
         }, 300);
     }
 
-    handleConnectionChange() {
+    function handleConnectionChange() {
         const connection = navigator.connection;
         if (connection) {
             console.log(`📶 Connection changed: ${connection.effectiveType}`);
