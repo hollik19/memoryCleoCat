@@ -466,7 +466,7 @@ class Main {
         console.log('▶️ Game resumed');
     }
 
-    showPauseIndicator() {
+    function showPauseIndicator() {
         let pauseIndicator = document.getElementById('pause-indicator');
         if (!pauseIndicator) {
             pauseIndicator = Utils.createElement('div');
@@ -496,7 +496,7 @@ class Main {
         pauseIndicator.style.display = 'block';
     }
 
-    hidePauseIndicator() {
+   function hidePauseIndicator() {
         const pauseIndicator = document.getElementById('pause-indicator');
         if (pauseIndicator) {
             pauseIndicator.style.display = 'none';
