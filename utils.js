@@ -518,7 +518,7 @@ class Utils {
 
     static preventZoom() {
         // Prevent pinch zoom on touch devices
-        if (this.isTouchDevice()) {
+        if (Utils.isTouchDevice()) {
             document.addEventListener('touchstart', (event) => {
                 if (event.touches.length > 1) {
                     event.preventDefault();
