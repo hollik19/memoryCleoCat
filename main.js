@@ -355,7 +355,7 @@ class Main {
         });
     }
 
-    handleVisibilityChange() {
+    function handleVisibilityChange() {
         if (document.hidden) {
             this.pause();
         } else {
