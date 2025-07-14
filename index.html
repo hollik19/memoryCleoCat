@@ -313,7 +313,45 @@
             addUniversalListener('play-again-btn', () => game.showTitle());
             addUniversalListener('reset-achievements-btn', () => main.showResetConfirmation());
             addUniversalListener('back-from-achievements-btn', () => game.showTitle());
-            
+
+            // Fix for dynamically created reset confirmation buttons
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.textContent && e.target.textContent.includes('Yes, Reset All')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (main && main.resetAchievements) {
+                        main.resetAchievements();
+                    }
+                    const overlay = e.target.closest('div[style*="position: fixed"]');
+                    if (overlay) overlay.remove();
+                }
+                
+                if (e.target && e.target.textContent && e.target.textContent.includes('Cancel')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const overlay = e.target.closest('div[style*="position: fixed"]');
+                    if (overlay) overlay.remove();
+                }
+            }, true);
+
+            document.addEventListener('touchend', function(e) {
+                if (e.target && e.target.textContent && e.target.textContent.includes('Yes, Reset All')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (main && main.resetAchievements) {
+                        main.resetAchievements();
+                    }
+                    const overlay = e.target.closest('div[style*="position: fixed"]');
+                    if (overlay) overlay.remove();
+                }
+                
+                if (e.target && e.target.textContent && e.target.textContent.includes('Cancel')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const overlay = e.target.closest('div[style*="position: fixed"]');
+                    if (overlay) overlay.remove();
+                }
+            }, true);
             console.log('🎮 Universal event handlers initialized');
         });
 
