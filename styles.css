@@ -278,11 +278,11 @@ h3 {
 }
 
 .card.joker {
-    background: linear-gradient(45deg, #fd79a8, #e84393);
+    background: linear-gradient(45deg, #4ecdc4, #44a08d);
 }
 
 .card.joker.flipped {
-    background: linear-gradient(45deg, #ff7675, #d63031);
+    background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
 }
 
 @keyframes matchPulse {
