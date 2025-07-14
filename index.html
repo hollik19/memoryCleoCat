@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cat Memory Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <h1>🐱 Cat Memory Game</h1>
+            <div class="cat-mascot">🐾</div>
+            <p>Test your memory with our feline friend!</p>
+            <button class="button" onclick="game.showGridSelection()">Start Game</button>
+            <button class="button" onclick="game.showAchievements()">Achievements</button>
+        </div>
+
+        <!-- Grid Selection Screen -->
+        <div id="grid-selection" class="screen">
+            <h2>Choose Grid Size</h2>
+            <div class="grid-selection">
+                <button class="button grid-btn" onclick="game.startGame(3)">
+                    <span class="grid-title">3×3 Grid</span>
+                    <span class="grid-detail">9 cards • Easy</span>
+                </button>
+                <button class="button grid-btn" onclick="game.startGame(4)">
+                    <span class="grid-title">4×4 Grid</span>
+                    <span class="grid-detail">16 cards • Medium</span>
+                </button>
+                <button class="button grid-btn" onclick="game.startGame(5)">
+                    <span class="grid-title">5×5 Grid</span>
+                    <span class="grid-detail">25 cards • Hard</span>
+                </button>
+                <button class="button grid-btn" onclick="game.startGame(6)">
+                    <span class="grid-title">6×6 Grid</span>
+                    <span class="grid-detail">36 cards • Expert</span>
+                </button>
+            </div>
+            <button class="button secondary" onclick="game.showTitle()">Back</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="score-area">
+                    <div class="player-score">
+                        <h3>Player 1</h3>
+                        <div id="player1-score" class="score-display">0</div>
+                    </div>
+                    <div class="current-player">
+                        <div id="current-player-indicator">Player 1's Turn</div>
+                        <div class="cat-sprite" id="cat-sprite">🐱</div>
+                    </div>
+                    <div class="player-score">
+                        <h3>Player 2</h3>
+                        <div id="player2-score" class="score-display">0</div>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="button small peek-btn" id="peek-button" onclick="game.showPeekChallenge()">
+                        🧮 PEEK (Math)
+                    </button>
+                    <button class="button small menu-btn" onclick="game.showTitle()">
+                        🏠 Menu
+                    </button>
+                </div>
+            </div>
+
+            <div class="game-board" id="game-board">
+                <!-- Cards will be generated here -->
+            </div>
+
+            <div class="movement-controls">
+                <div class="control-row">
+                    <button class="control-btn" onclick="game.moveCat('up')" aria-label="Move up">
+                        ⬆️
+                    </button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" onclick="game.moveCat('left')" aria-label="Move left">
+                        ⬅️
+                    </button>
+                    <button class="control-btn fire-btn" onclick="game.flipCard()" aria-label="Flip card">
+                        FLIP
+                    </button>
+                    <button class="control-btn" onclick="game.moveCat('right')" aria-label="Move right">
+                        ➡️
+                    </button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" onclick="game.moveCat('down')" aria-label="Move down">
+                        ⬇️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peek Challenge Screen -->
+        <div id="peek-screen" class="screen">
+            <h2>Math Challenge! 🧮</h2>
+            <div class="cat-mascot thinking">🤔</div>
+            <p class="challenge-instruction">Solve to peek at all cards for 4 seconds!</p>
+            
+            <div class="math-problem">
+                <div id="math-question" class="math-display">5 + 3 = ?</div>
+                
+                <div class="answer-section">
+                    <div class="answer-display">
+                        <span class="answer-label">Your Answer:</span>
+                        <div id="answer-display" class="answer-value">_</div>
+                    </div>
+                    
+                    <!-- Mobile-friendly number buttons 0-10 -->
+                    <div class="number-grid">
+                        <button class="num-btn" onclick="game.inputNumber(1)">1</button>
+                        <button class="num-btn" onclick="game.inputNumber(2)">2</button>
+                        <button class="num-btn" onclick="game.inputNumber(3)">3</button>
+                        <button class="num-btn" onclick="game.inputNumber(4)">4</button>
+                        <button class="num-btn" onclick="game.inputNumber(5)">5</button>
+                        <button class="num-btn" onclick="game.inputNumber(6)">6</button>
+                        <button class="num-btn" onclick="game.inputNumber(7)">7</button>
+                        <button class="num-btn" onclick="game.inputNumber(8)">8</button>
+                        <button class="num-btn" onclick="game.inputNumber(9)">9</button>
+                        <button class="num-btn" onclick="game.inputNumber(10)">10</button>
+                        <button class="num-btn zero-btn" onclick="game.inputNumber(0)">0</button>
+                        <button class="num-btn clear-btn" onclick="game.clearNumber()">Clear</button>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="button submit-btn" onclick="game.submitMathAnswer()">
+                            ✅ Submit Answer
+                        </button>
+                        <button class="button secondary cancel-btn" onclick="game.showGame()">
+                            ❌ Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mini Game Screen -->
+        <div id="minigame-screen" class="screen">
+            <h2>🐭 Catch the Mice!</h2>
+            <div class="minigame-header">
+                <div class="timer-display">
+                    ⏰ Time: <span id="minigame-timer">30</span>s
+                </div>
+                <div class="minigame-score-display">
+                    🏆 Score: <span id="minigame-score">0</span>
+                </div>
+            </div>
+            
+            <div class="minigame-legend">
+                <span>🐭 Brown: 1pt</span>
+                <span>🐁 Gray: 2pts</span>
+                <span>🤍 White: 3pts</span>
+                <span>✨ Golden: 5pts</span>
+            </div>
+            
+            <div class="minigame-area" id="minigame-area">
+                <div class="cat-player" id="cat-player">🐱</div>
+                <!-- Mice will be spawned here -->
+            </div>
+            
+            <div class="minigame-controls">
+                <div class="control-row">
+                    <button class="control-btn" onclick="minigame.moveCat('up')" aria-label="Move cat up">
+                        ⬆️
+                    </button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" onclick="minigame.moveCat('left')" aria-label="Move cat left">
+                        ⬅️
+                    </button>
+                    <button class="control-btn fire-btn pounce-btn" onclick="minigame.pounce()" aria-label="Pounce on mice">
+                        POUNCE
+                    </button>
+                    <button class="control-btn" onclick="minigame.moveCat('right')" aria-label="Move cat right">
+                        ➡️
+                    </button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" onclick="minigame.moveCat('down')" aria-label="Move cat down">
+                        ⬇️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen">
+            <h2>🎉 Game Over!</h2>
+            <div class="cat-mascot celebration">🏆</div>
+            <div class="final-scores">
+                <div class="winner-announcement" id="winner-text">Player 1 Wins!</div>
+                <div class="score-summary">
+                    <div class="final-score">
+                        <span class="player-label">Player 1:</span>
+                        <span id="final-score1" class="score-value">0</span>
+                    </div>
+                    <div class="final-score">
+                        <span class="player-label">Player 2:</span>
+                        <span id="final-score2" class="score-value">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="achievements-earned" id="achievements-earned">
+                <!-- New achievements will be displayed here -->
+            </div>
+            <div class="game-over-actions">
+                <button class="button" onclick="game.showGridSelection()">🎮 Play Again</button>
+                <button class="button secondary" onclick="game.showTitle()">🏠 Main Menu</button>
+            </div>
+        </div>
+
+        <!-- Achievements Screen -->
+        <div id="achievements-screen" class="screen">
+            <h2>🏆 Achievements</h2>
+            <div class="achievements-list" id="achievements-list">
+                <!-- Achievements will be displayed here -->
+            </div>
+            <button class="button secondary" onclick="game.showTitle()">🏠 Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="loading hidden">
+        <div class="loading-spinner">🐱</div>
+        <div class="loading-text">Loading game...</div>
+    </div>
+
+    <!-- Error dialog -->
+    <div id="error-dialog" class="error-dialog hidden">
+        <div class="error-content">
+            <h3>😿 Oops!</h3>
+            <p id="error-message">Something went wrong</p>
+            <button class="button" onclick="location.reload()">🔄 Refresh</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="audio.js"></script>
+    <script src="graphics.js"></script>
+    <script src="input.js"></script>
+    <script src="minigame.js"></script>
+    <script src="game.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
