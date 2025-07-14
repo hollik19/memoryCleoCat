@@ -783,5 +783,18 @@ h3 {
         background: rgba(60, 60, 60, 0.8);
         color: #e0e0e0;
         border-color: #555;
+}
+}
+
+/* Force mobile screen visibility */
+@media (max-width: 768px) {
+    .screen {
+        display: none !important;
+    }
+    
+    .screen.active {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 }
