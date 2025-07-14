@@ -1,8 +1,7 @@
 // Main.js Part 1 - Application Initialization and Setup
 
 class Main {
-
-    constructor() {
+function constructor() {
         this.initialized = false;
         this.gameLoop = null;
         this.lastFrameTime = 0;
@@ -14,8 +13,7 @@ class Main {
             currentFPS: 60
         };
     }
-
-    init() {
+function init() {
         if (this.initialized) return;
 
         console.log('🐱 Cat Memory Game - Initializing...');
@@ -39,9 +37,9 @@ class Main {
         } catch (error) {
             console.error('Failed to initialize game:', error);
             this.showErrorMessage('Failed to load the game. Please refresh the page.');
-}
-
-    setupGlobalErrorHandling() {
+        }
+    }
+function setupGlobalErrorHandling() {
         window.addEventListener('error', (event) => {
             console.error('Global error:', event.error);
             this.handleError(event.error);
@@ -59,9 +57,9 @@ class Main {
                     this.handleOrientationChange();
                 }, 100);
             });
-}
-
-    initializeComponents() {
+        }
+    }
+function initializeComponents() {
         // Verify all global instances exist
         const components = [
             { name: 'audioManager', instance: audioManager },
@@ -74,7 +72,8 @@ class Main {
         components.forEach(({ name, instance }) => {
             if (!instance) {
                 throw new Error(`${name} not initialized`);
-});
+            }
+        });
 
         // Additional mobile optimizations
         if (Utils.isMobile()) {
@@ -83,8 +82,7 @@ class Main {
 
         console.log('✅ All components initialized');
     }
-
-    setupMobileOptimizations() {
+function setupMobileOptimizations() {
         // Prevent zoom and improve touch responsiveness
         Utils.preventZoom();
         
@@ -96,7 +94,8 @@ class Main {
             const screenSize = Utils.getScreenSize();
             if (screenSize.isSmall) {
                 graphics.setPerformanceMode('low');
-}
+            }
+        }
         
         // Reduce audio complexity on low-end devices
         if (audioManager && navigator.hardwareConcurrency < 4) {
@@ -106,8 +105,7 @@ class Main {
         
         console.log('📱 Mobile optimizations applied');
     }
-
-    setupEventListeners() {
+function setupEventListeners() {
         // Handle window resize for responsive design
         window.addEventListener('resize', Utils.debounce(() => {
             this.handleResize();
@@ -135,13 +133,13 @@ class Main {
             document.addEventListener('contextmenu', (e) => {
                 if (e.target.closest('.game-container')) {
                     e.preventDefault();
-});
+                }
+            });
         }
 
         console.log('📱 Event listeners setup complete');
     }
-
-    optimizeForDevice() {
+function optimizeForDevice() {
         // Detect device capabilities and optimize accordingly
         const deviceInfo = {
             isMobile: Utils.isMobile(),
@@ -158,7 +156,8 @@ class Main {
             
             if (graphics) {
                 graphics.setPerformanceMode('low');
-}
+            }
+        }
 
         // Optimize for small screens
         if (deviceInfo.screen.isSmall) {
@@ -185,8 +184,7 @@ class Main {
         // Auto-save periodically
         this.autoSave();
     }
-
-    render() {
+function render() {
         // Most rendering is handled by CSS animations and graphics manager
         // This is mainly for any custom rendering if needed in the future
         
@@ -208,10 +206,10 @@ class Main {
             // Debug FPS display
             if (window.DEBUG_MODE) {
                 this.updateFPSDisplay();
-}
+            }
+        }
     }
-
-    adjustPerformance() {
+function adjustPerformance() {
         const fps = this.performanceMonitor.currentFPS;
         
         // If FPS drops below 20, switch to low performance mode
@@ -224,9 +222,9 @@ class Main {
         if (fps > 50 && graphics && graphics.performanceMode === 'low') {
             graphics.setPerformanceMode('auto');
             console.log('📈 Good FPS detected, upgrading performance mode');
-}
-
-    updateFPSDisplay() {
+        }
+    }
+function updateFPSDisplay() {
         const fpsDisplay = document.getElementById('fps-display');
         if (fpsDisplay) {
             fpsDisplay.textContent = `FPS: ${this.performanceMonitor.currentFPS}`;
@@ -238,10 +236,10 @@ class Main {
                 fpsDisplay.style.color = '#fdcb6e';
             } else {
                 fpsDisplay.style.color = '#e17055';
-}
+            }
+        }
     }
-
-    updateUI() {
+function updateUI() {
         // Update any UI elements that need real-time updates
         
         // Update connection status if available
@@ -252,9 +250,9 @@ class Main {
         // Update battery status on mobile
         if (Utils.isMobile() && 'getBattery' in navigator) {
             this.updateBatteryStatus();
-}
-
-    updateConnectionStatus() {
+        }
+    }
+function updateConnectionStatus() {
         const connection = navigator.connection;
         if (connection && connection.effectiveType) {
             // Adjust features based on connection speed
@@ -262,23 +260,24 @@ class Main {
                 // Disable some visual effects on slow connections
                 if (graphics) {
                     graphics.setPerformanceMode('low');
-}
-}
-
-    updateBatteryStatus() {
+                }
+            }
+        }
+    }
+function updateBatteryStatus() {
         navigator.getBattery().then((battery) => {
             // Reduce performance when battery is low
             if (battery.level < 0.2 && !battery.charging) {
                 if (graphics && graphics.performanceMode !== 'low') {
                     graphics.setPerformanceMode('low');
                     Utils.showNotification('Battery saver mode enabled', 'info', 2000);
-}
+                }
+            }
         }).catch(() => {
             // Battery API not supported
         });
     }
-
-    autoSave() {
+function autoSave() {
         // Auto-save game data every 30 seconds
         if (!this.lastAutoSave || Date.now() - this.lastAutoSave > 30000) {
             if (game) {
@@ -286,11 +285,12 @@ class Main {
                 game.saveGameToHistory();
             }
             this.lastAutoSave = Date.now();
+        } 
 }
 }
 // Main.js Part 3 - Event Handling and Responsive Design
 
-    handleResize() {
+    function handleResize() {
         // Adjust game layout for new window size
         const gameContainer = document.querySelector('.game-container');
         if (gameContainer) {
@@ -322,7 +322,7 @@ class Main {
         console.log('📐 Window resized, layout adjusted');
     }
 
-   repositionUI() {
+   function repositionUI() {
         // Reposition floating elements like notifications
         const notifications = document.querySelectorAll('.notification');
         notifications.forEach(notification => {
@@ -338,17 +338,19 @@ class Main {
                 notification.style.right = '20px';
                 notification.style.left = 'auto';
                 notification.style.maxWidth = '300px';
-});
+            }
+        });
     }
 
-    handleVisibilityChange() {
+    function handleVisibilityChange() {
         if (document.hidden) {
             this.pause();
         } else {
             this.resume();
-}
+        }
+    }
 
-    handleOrientationChange() {
+    function handleOrientationChange() {
         console.log('📱 Orientation changed');
         
         // Delay handling to let the browser finish the orientation change
@@ -365,7 +367,7 @@ class Main {
         }, 300);
     }
 
-    handleConnectionChange() {
+    function handleConnectionChange() {
         const connection = navigator.connection;
         if (connection) {
             console.log(`📶 Connection changed: ${connection.effectiveType}`);
@@ -375,10 +377,11 @@ class Main {
                 Utils.showNotification('Slow connection detected - optimizing performance', 'info', 3000);
                 if (graphics) {
                     graphics.setPerformanceMode('low');
-}
-}
-
-    refreshUI() {
+                }
+            }
+        }
+    }
+function refreshUI() {
         // Force a complete UI refresh
         if (game && game.gameBoard) {
             game.updateCatPosition();
@@ -391,9 +394,9 @@ class Main {
         if (minigame && minigame.isActive) {
             minigame.updateScore();
             minigame.updateTimer();
-}
-
-    pause() {
+        }
+    }
+function pause() {
         // Pause audio
         if (audioManager) {
             audioManager.stopMusic();
@@ -415,8 +418,7 @@ class Main {
 
         console.log('⏸️ Game paused');
     }
-
-    resume() {
+function resume() {
         // Resume audio based on current screen
         if (audioManager && game) {
             switch (game.currentScreen) {
@@ -429,7 +431,8 @@ class Main {
                 case 'minigame':
                     audioManager.startMusic('minigame');
                     break;
-}
+            }
+        }
 
         // Resume minigame if it was active
         if (minigame && game && game.currentScreen === 'minigame') {
@@ -446,8 +449,7 @@ class Main {
 
         console.log('▶️ Game resumed');
     }
-
-    showPauseIndicator() {
+function showPauseIndicator() {
         let pauseIndicator = document.getElementById('pause-indicator');
         if (!pauseIndicator) {
             pauseIndicator = Utils.createElement('div');
@@ -476,12 +478,12 @@ class Main {
         
         pauseIndicator.style.display = 'block';
     }
-
-    hidePauseIndicator() {
+function hidePauseIndicator() {
         const pauseIndicator = document.getElementById('pause-indicator');
         if (pauseIndicator) {
             pauseIndicator.style.display = 'none';
-}
+        }
+    }
 }
 // Main.js Part 4 - Error Handling and Debug Tools
 
@@ -505,7 +507,8 @@ class Main {
                     console.error('Failed to return to title screen:', e);
                     // Last resort: reload the page
                     location.reload();
-}, 2000);
+                }
+            }, 2000);
         }
 
         // Send error to analytics if available
@@ -536,7 +539,8 @@ class Main {
             Utils.saveToLocalStorage('errorReports', errors);
         } catch (e) {
             console.warn('Could not save error report:', e);
-}
+        }
+    }
 
     showErrorMessage(message) {
         // Create error overlay
@@ -576,11 +580,12 @@ class Main {
         setTimeout(() => {
             if (overlay.parentNode) {
                 overlay.remove();
-}, 10000);
+            }
+        }, 10000);
     }
 
     // Debug and Development Tools
-    enableDebugMode() {
+function enableDebugMode() {
         window.DEBUG_MODE = true;
         
         // Add FPS display
@@ -608,30 +613,36 @@ class Main {
             unlockAllAchievements: () => {
                 if (game) {
                     game.unlockAllAchievements();
-},
+                }
+            },
             triggerMinigame: () => {
                 if (game) {
                     game.triggerMinigame();
-},
+                }
+            },
             setScore: (player, score) => {
                 if (game) {
                     game.setScore(player, score);
-},
+                }
+            },
             addTestCards: () => {
                 if (game) {
                     game.addTestCards();
-},
+                }
+            },
             getGameState: () => {
                 return this.getGameState();
             },
             resetData: () => {
                 if (game) {
                     game.resetAllData();
-},
+                }
+            },
             testAudio: () => {
                 if (audioManager) {
                     audioManager.testAudio();
-},
+                }
+            },
             getPerformanceInfo: () => {
                 return {
                     fps: this.performanceMonitor.currentFPS,
@@ -639,13 +650,13 @@ class Main {
                     audio: audioManager ? audioManager.getStatus() : null,
                     input: inputManager ? inputManager.getStatus() : null
                 };
-};
+            }
+        };
 
         console.log('🐛 Debug mode enabled. Use window.debug object for debug functions.');
         Utils.showNotification('Debug mode enabled! Check console for commands.', 'info', 3000);
     }
-
-    createDebugPanel() {
+function createDebugPanel() {
         const panel = Utils.createElement('div');
         panel.id = 'debug-panel';
         panel.style.cssText = `
@@ -677,8 +688,7 @@ class Main {
             this.updateDebugPanel();
         }, 1000);
     }
-
-    updateDebugPanel() {
+function updateDebugPanel() {
         if (!window.DEBUG_MODE) return;
         
         const gameState = this.getGameState();
@@ -696,11 +706,11 @@ class Main {
         if (perfElement) {
             const mode = graphics ? graphics.performanceMode : 'unknown';
             perfElement.textContent = `${this.performanceMonitor.currentFPS}fps (${mode})`;
-}
+        }
+    }
 }
 // Main.js Part 5 - Cleanup and Application Management (Complete)
-
-    cleanup() {
+function cleanup() {
         console.log('🧹 Cleaning up...');
 
         // Stop game loop
@@ -740,7 +750,7 @@ class Main {
     }
 
     // Public API methods
-    getGameState() {
+function getGameState() {
         return {
             currentScreen: game ? game.currentScreen : 'unknown',
             currentPlayer: game ? game.currentPlayer : null,
@@ -752,15 +762,15 @@ class Main {
             performance: {
                 fps: this.performanceMonitor.currentFPS,
                 mode: graphics ? graphics.performanceMode : 'unknown'
-};
+            }
+        };
     }
-
-    resetGame() {
+function resetGame() {
         if (game) {
             game.showTitle();
-}
-
-    toggleDebugMode() {
+        }
+    }
+function toggleDebugMode() {
         if (window.DEBUG_MODE) {
             window.DEBUG_MODE = false;
             const fpsDisplay = document.getElementById('fps-display');
@@ -771,9 +781,9 @@ class Main {
             Utils.showNotification('Debug mode disabled', 'info', 2000);
         } else {
             this.enableDebugMode();
-}
-
-    getSystemInfo() {
+        }
+    }
+function getSystemInfo() {
         return {
             userAgent: navigator.userAgent,
             screen: {
@@ -796,22 +806,23 @@ class Main {
                 localStorage: !!window.localStorage,
                 vibrate: !!navigator.vibrate,
                 gamepad: !!navigator.getGamepads
-};
+            }
+        };
     }
-
-    exportGameData() {
+function exportGameData() {
         if (game) {
             game.exportGameData();
-}
+        }
+    }
 
     importGameData(dataStr) {
         if (game) {
             game.importGameData(dataStr);
-}
+        }
+    }
 
                                   // Main.js Part 6 - Final Methods and Initialization (Complete)
-
-    getPerformanceMetrics() {
+function getPerformanceMetrics() {
         return {
             fps: this.performanceMonitor.currentFPS,
             frameTime: 1000 / this.performanceMonitor.currentFPS,
@@ -835,9 +846,9 @@ class Main {
     playSound(soundName) {
         if (audioManager) {
             audioManager.playSound(soundName);
-}
-
-    recoverFromError() {
+        }
+    }
+function recoverFromError() {
         try {
             console.log('🔧 Attempting error recovery...');
             
@@ -855,10 +866,11 @@ class Main {
             Utils.showErrorDialog('Recovery failed. Please refresh the page.', () => {
                 location.reload();
             });
-}
+        }
+    }
 
     // Game state management
-    saveState() {
+function saveState() {
         const state = {
             gameState: this.getGameState(),
             timestamp: Date.now(),
@@ -868,14 +880,14 @@ class Main {
         Utils.saveToLocalStorage('appState', state);
         console.log('💾 Application state saved');
     }
-
-    loadState() {
+function loadState() {
         const state = Utils.loadFromLocalStorage('appState', null);
         if (state && state.gameState) {
             console.log('📁 Application state loaded');
             return state;
         }
         return null;
+    }
 }
 
 // Initialize the application
@@ -903,6 +915,7 @@ document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.code === 'KeyR') {
         e.preventDefault();
         main.recoverFromError();
+    }
 });
 
 // Add some CSS custom properties for responsive design
@@ -912,11 +925,13 @@ document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}
 window.addEventListener('focus', () => {
     if (main.initialized) {
         main.resume();
+    }
 });
 
 window.addEventListener('blur', () => {
     if (main.initialized) {
         main.pause();
+    }
 });
 
 // Final setup message
