@@ -58,14 +58,7 @@ class Game {
 
 showGridSelection() {
     this.currentScreen = 'gridSelection';
-    
-    // Direct screen switching - bypass Utils.showScreen()
-    const titleScreen = document.getElementById('title-screen');
-    const gridScreen = document.getElementById('grid-selection');
-    
-    if (titleScreen) titleScreen.classList.remove('active');
-    if (gridScreen) gridScreen.classList.add('active');
-    
+    Utils.showScreen('grid-selection');
     audioManager.playSound('buttonClick');
 }
         
