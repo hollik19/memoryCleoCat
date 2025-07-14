@@ -432,6 +432,18 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => main.init());
 } else {
     main.init();
+
+        const updateVH = () => {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+
+        updateVH();
+        window.addEventListener('resize', updateVH);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateVH, 300);
+        });
+
 }
 
 // Expose main instance globally for debugging
