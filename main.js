@@ -300,10 +300,6 @@ class Main {
             this.lastAutoSave = Date.now();
         } 
 }
-
-// Main.js Part 2 - Game Loop and Performance Management
-    
-    }
 }
 // Main.js Part 3 - Event Handling and Responsive Design
 
