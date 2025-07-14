@@ -2,12 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Cat Memory Game</title>
-    <link rel="stylesheet" href="styles.css">
-    <meta name="theme-color" content="#667eea">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Cat Memory Game</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* Universal mobile fixes */
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        input {
+            -webkit-user-select: text;
+            touch-action: manipulation;
+        }
+        
+        button, .button, .control-btn, .num-btn {
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: transparent !important;
+            cursor: pointer;
+            min-height: 44px; /* iOS minimum touch target */
+            min-width: 44px;
+        }
+        
+        /* Prevent zoom on input focus */
+        @media screen and (max-width: 768px) {
+            input[type="number"] {
+                font-size: 16px !important;
+            }
+            
+            .game-container {
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+                overflow-x: hidden;
+            }
+            
+            body {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
@@ -17,31 +60,19 @@
             <div class="cat-mascot">🐾</div>
             <p>Test your memory with our feline friend!</p>
             <button class="button" id="start-game-btn">Start Game</button>
-            <button class="button" onclick="game.showAchievements()">Achievements</button>
+            <button class="button" id="achievements-btn">Achievements</button>
         </div>
 
         <!-- Grid Selection Screen -->
         <div id="grid-selection" class="screen">
             <h2>Choose Grid Size</h2>
             <div class="grid-selection">
-                <button class="button grid-btn" onclick="game.startGame(3)">
-                    <span class="grid-title">3×3 Grid</span>
-                    <span class="grid-detail">9 cards • Easy</span>
-                </button>
-                <button class="button grid-btn" onclick="game.startGame(4)">
-                    <span class="grid-title">4×4 Grid</span>
-                    <span class="grid-detail">16 cards • Medium</span>
-                </button>
-                <button class="button grid-btn" onclick="game.startGame(5)">
-                    <span class="grid-title">5×5 Grid</span>
-                    <span class="grid-detail">25 cards • Hard</span>
-                </button>
-                <button class="button grid-btn" onclick="game.startGame(6)">
-                    <span class="grid-title">6×6 Grid</span>
-                    <span class="grid-detail">36 cards • Expert</span>
-                </button>
+                <button class="button" id="grid-3x3-btn">3x3 Grid<br><small>9 cards</small></button>
+                <button class="button" id="grid-4x4-btn">4x4 Grid<br><small>16 cards</small></button>
+                <button class="button" id="grid-5x5-btn">5x5 Grid<br><small>25 cards</small></button>
+                <button class="button" id="grid-6x6-btn">6x6 Grid<br><small>36 cards</small></button>
             </div>
-            <button class="button secondary" onclick="game.showTitle()">Back</button>
+            <button class="button secondary" id="back-to-title-btn">Back</button>
         </div>
 
         <!-- Game Screen -->
@@ -50,7 +81,7 @@
                 <div class="score-area">
                     <div class="player-score">
                         <h3>Player 1</h3>
-                        <div id="player1-score" class="score-display">0</div>
+                        <div id="player1-score">0</div>
                     </div>
                     <div class="current-player">
                         <div id="current-player-indicator">Player 1's Turn</div>
@@ -58,16 +89,12 @@
                     </div>
                     <div class="player-score">
                         <h3>Player 2</h3>
-                        <div id="player2-score" class="score-display">0</div>
+                        <div id="player2-score">0</div>
                     </div>
                 </div>
                 <div class="game-controls">
-                    <button class="button small peek-btn" id="peek-button" onclick="game.showPeekChallenge()">
-                        🧮 PEEK (Math)
-                    </button>
-                    <button class="button small menu-btn" onclick="game.showTitle()">
-                        🏠 Menu
-                    </button>
+                    <button class="button small" id="peek-button">PEEK (Math)</button>
+                    <button class="button small" id="main-menu-btn">Main Menu</button>
                 </div>
             </div>
 
@@ -77,173 +104,101 @@
 
             <div class="movement-controls">
                 <div class="control-row">
-                    <button class="control-btn" onclick="game.moveCat('up')" aria-label="Move up">
-                        ⬆️
-                    </button>
+                    <button class="control-btn" id="move-up-btn">↑</button>
                 </div>
                 <div class="control-row">
-                    <button class="control-btn" onclick="game.moveCat('left')" aria-label="Move left">
-                        ⬅️
-                    </button>
-                    <button class="control-btn fire-btn" onclick="game.flipCard()" aria-label="Flip card">
-                        FLIP
-                    </button>
-                    <button class="control-btn" onclick="game.moveCat('right')" aria-label="Move right">
-                        ➡️
-                    </button>
+                    <button class="control-btn" id="move-left-btn">←</button>
+                    <button class="control-btn fire-btn" id="flip-card-btn">FLIP</button>
+                    <button class="control-btn" id="move-right-btn">→</button>
                 </div>
                 <div class="control-row">
-                    <button class="control-btn" onclick="game.moveCat('down')" aria-label="Move down">
-                        ⬇️
-                    </button>
+                    <button class="control-btn" id="move-down-btn">↓</button>
                 </div>
             </div>
         </div>
 
         <!-- Peek Challenge Screen -->
         <div id="peek-screen" class="screen">
-            <h2>Math Challenge! 🧮</h2>
-            <div class="cat-mascot thinking">🤔</div>
-            <p class="challenge-instruction">Solve to peek at all cards for 4 seconds!</p>
-            
+            <h2>Math Challenge!</h2>
+            <div class="cat-mascot">🤔</div>
             <div class="math-problem">
-                <div id="math-question" class="math-display">5 + 3 = ?</div>
-                
-                <div class="answer-section">
-                    <div class="answer-display">
-                        <span class="answer-label">Your Answer:</span>
-                        <div id="answer-display" class="answer-value">_</div>
-                    </div>
-                    
-                    <!-- Mobile-friendly number buttons 0-10 -->
-                    <div class="number-grid">
-                        <button class="num-btn" onclick="game.inputNumber(1)">1</button>
-                        <button class="num-btn" onclick="game.inputNumber(2)">2</button>
-                        <button class="num-btn" onclick="game.inputNumber(3)">3</button>
-                        <button class="num-btn" onclick="game.inputNumber(4)">4</button>
-                        <button class="num-btn" onclick="game.inputNumber(5)">5</button>
-                        <button class="num-btn" onclick="game.inputNumber(6)">6</button>
-                        <button class="num-btn" onclick="game.inputNumber(7)">7</button>
-                        <button class="num-btn" onclick="game.inputNumber(8)">8</button>
-                        <button class="num-btn" onclick="game.inputNumber(9)">9</button>
-                        <button class="num-btn" onclick="game.inputNumber(10)">10</button>
-                        <button class="num-btn zero-btn" onclick="game.inputNumber(0)">0</button>
-                        <button class="num-btn clear-btn" onclick="game.clearNumber()">Clear</button>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="button submit-btn" onclick="game.submitMathAnswer()">
-                            ✅ Submit Answer
-                        </button>
-                        <button class="button secondary cancel-btn" onclick="game.showGame()">
-                            ❌ Cancel
-                        </button>
-                    </div>
+                <div id="math-question">5 + 3 = ?</div>
+                <div class="number-input">
+                    <input type="number" id="math-answer" min="0" max="10" placeholder="?" readonly>
+                    <button class="button" id="submit-math-btn">Submit</button>
                 </div>
             </div>
+            <div class="number-pad">
+                <button class="num-btn" data-number="1">1</button>
+                <button class="num-btn" data-number="2">2</button>
+                <button class="num-btn" data-number="3">3</button>
+                <button class="num-btn" data-number="4">4</button>
+                <button class="num-btn" data-number="5">5</button>
+                <button class="num-btn" data-number="6">6</button>
+                <button class="num-btn" data-number="7">7</button>
+                <button class="num-btn" data-number="8">8</button>
+                <button class="num-btn" data-number="9">9</button>
+                <button class="num-btn" data-number="0">0</button>
+                <button class="num-btn" data-number="10">10</button>
+                <button class="num-btn clear" id="clear-number-btn">Clear</button>
+            </div>
+            <button class="button secondary" id="cancel-peek-btn">Cancel</button>
         </div>
 
         <!-- Mini Game Screen -->
         <div id="minigame-screen" class="screen">
-            <h2>🐭 Catch the Mice!</h2>
+            <h2>Catch the Mice!</h2>
             <div class="minigame-header">
-                <div class="timer-display">
-                    ⏰ Time: <span id="minigame-timer">30</span>s
-                </div>
-                <div class="minigame-score-display">
-                    🏆 Score: <span id="minigame-score">0</span>
-                </div>
+                <div class="timer">Time: <span id="minigame-timer">30</span>s</div>
+                <div class="minigame-score">Score: <span id="minigame-score">0</span></div>
             </div>
-            
-            <div class="minigame-legend">
-                <span>🐭 Brown: 1pt</span>
-                <span>🐁 Gray: 2pts</span>
-                <span>🤍 White: 3pts</span>
-                <span>✨ Golden: 5pts</span>
-            </div>
-            
             <div class="minigame-area" id="minigame-area">
                 <div class="cat-player" id="cat-player">🐱</div>
                 <!-- Mice will be spawned here -->
             </div>
-            
             <div class="minigame-controls">
                 <div class="control-row">
-                    <button class="control-btn" onclick="minigame.moveCat('up')" aria-label="Move cat up">
-                        ⬆️
-                    </button>
+                    <button class="control-btn" id="minigame-up-btn">↑</button>
                 </div>
                 <div class="control-row">
-                    <button class="control-btn" onclick="minigame.moveCat('left')" aria-label="Move cat left">
-                        ⬅️
-                    </button>
-                    <button class="control-btn fire-btn pounce-btn" onclick="minigame.pounce()" aria-label="Pounce on mice">
-                        POUNCE
-                    </button>
-                    <button class="control-btn" onclick="minigame.moveCat('right')" aria-label="Move cat right">
-                        ➡️
-                    </button>
+                    <button class="control-btn" id="minigame-left-btn">←</button>
+                    <button class="control-btn fire-btn" id="minigame-pounce-btn">POUNCE</button>
+                    <button class="control-btn" id="minigame-right-btn">→</button>
                 </div>
                 <div class="control-row">
-                    <button class="control-btn" onclick="minigame.moveCat('down')" aria-label="Move cat down">
-                        ⬇️
-                    </button>
+                    <button class="control-btn" id="minigame-down-btn">↓</button>
                 </div>
             </div>
         </div>
 
         <!-- Game Over Screen -->
         <div id="gameover-screen" class="screen">
-            <h2>🎉 Game Over!</h2>
-            <div class="cat-mascot celebration">🏆</div>
+            <h2>Game Over!</h2>
+            <div class="cat-mascot celebration">🎉</div>
             <div class="final-scores">
                 <div class="winner-announcement" id="winner-text">Player 1 Wins!</div>
                 <div class="score-summary">
-                    <div class="final-score">
-                        <span class="player-label">Player 1:</span>
-                        <span id="final-score1" class="score-value">0</span>
-                    </div>
-                    <div class="final-score">
-                        <span class="player-label">Player 2:</span>
-                        <span id="final-score2" class="score-value">0</span>
-                    </div>
+                    <div>Player 1: <span id="final-score1">0</span></div>
+                    <div>Player 2: <span id="final-score2">0</span></div>
                 </div>
             </div>
             <div class="achievements-earned" id="achievements-earned">
-                <!-- New achievements will be displayed here -->
+                <!-- Achievements will be displayed here -->
             </div>
-            <div class="game-over-actions">
-                <button class="button" onclick="game.showGridSelection()">🎮 Play Again</button>
-                <button class="button secondary" onclick="game.showTitle()">🏠 Main Menu</button>
-            </div>
+            <button class="button" id="play-again-btn">Play Again</button>
         </div>
 
         <!-- Achievements Screen -->
         <div id="achievements-screen" class="screen">
-            <h2>🏆 Achievements</h2>
+            <h2>Achievements</h2>
             <div class="achievements-list" id="achievements-list">
                 <!-- Achievements will be displayed here -->
             </div>
-            <button class="button secondary" onclick="game.showTitle()">🏠 Back to Menu</button>
+            <button class="button reset-achievements-btn" id="reset-achievements-btn">🗑️ Reset All Achievements</button>
+            <button class="button secondary" id="back-from-achievements-btn">Back</button>
         </div>
     </div>
 
-    <!-- Loading indicator -->
-    <div id="loading-indicator" class="loading hidden">
-        <div class="loading-spinner">🐱</div>
-        <div class="loading-text">Loading game...</div>
-    </div>
-
-    <!-- Error dialog -->
-    <div id="error-dialog" class="error-dialog hidden">
-        <div class="error-content">
-            <h3>😿 Oops!</h3>
-            <p id="error-message">Something went wrong</p>
-            <button class="button" onclick="location.reload()">🔄 Refresh</button>
-        </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="utils.js"></script>
     <script src="audio.js"></script>
     <script src="graphics.js"></script>
@@ -251,29 +206,141 @@
     <script src="minigame.js"></script>
     <script src="game.js"></script>
     <script src="main.js"></script>
+
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const startBtn = document.getElementById('start-game-btn');
-    if (startBtn) {
-        startBtn.addEventListener('click', function() {
-            document.getElementById('title-screen').style.display = 'none';
-            document.getElementById('grid-selection').style.display = 'block';
-            if (typeof audioManager !== 'undefined') {
-                audioManager.playSound('buttonClick');
-            }
-        });
+    // Universal event handler that works on all devices
+    function createUniversalHandler(callback) {
+        let touchStarted = false;
+        let clickHandled = false;
         
-        // Also try touch events for mobile
-        startBtn.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            document.getElementById('title-screen').style.display = 'none';
-            document.getElementById('grid-selection').style.display = 'block';
-            if (typeof audioManager !== 'undefined') {
-                audioManager.playSound('buttonClick');
+        return {
+            handleTouchStart: function(e) {
+                touchStarted = true;
+                clickHandled = false;
+            },
+            
+            handleTouchEnd: function(e) {
+                if (touchStarted && !clickHandled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clickHandled = true;
+                    setTimeout(() => callback(), 10);
+                }
+                touchStarted = false;
+            },
+            
+            handleClick: function(e) {
+                if (!clickHandled) {
+                    callback();
+                }
+                clickHandled = false;
+            }
+        };
+    }
+
+    // Add universal event listeners
+    function addUniversalListener(elementId, callback) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        const handler = createUniversalHandler(callback);
+        
+        element.addEventListener('touchstart', handler.handleTouchStart, {passive: false});
+        element.addEventListener('touchend', handler.handleTouchEnd, {passive: false});
+        element.addEventListener('click', handler.handleClick);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Wait for game objects to be ready
+        function waitForGame(callback) {
+            if (typeof game !== 'undefined' && typeof audioManager !== 'undefined') {
+                callback();
+            } else {
+                setTimeout(() => waitForGame(callback), 100);
+            }
+        }
+        
+        waitForGame(function() {
+            
+            // Title screen
+            addUniversalListener('start-game-btn', () => game.showGridSelection());
+            addUniversalListener('achievements-btn', () => game.showAchievements());
+
+            // Grid selection
+            addUniversalListener('grid-3x3-btn', () => game.startGame(3));
+            addUniversalListener('grid-4x4-btn', () => game.startGame(4));
+            addUniversalListener('grid-5x5-btn', () => game.startGame(5));
+            addUniversalListener('grid-6x6-btn', () => game.startGame(6));
+            addUniversalListener('back-to-title-btn', () => game.showTitle());
+
+            // Game controls
+            addUniversalListener('peek-button', () => game.showPeekChallenge());
+            addUniversalListener('main-menu-btn', () => game.showTitle());
+            
+            // Movement controls
+            addUniversalListener('move-up-btn', () => game.moveCat('up'));
+            addUniversalListener('move-down-btn', () => game.moveCat('down'));
+            addUniversalListener('move-left-btn', () => game.moveCat('left'));
+            addUniversalListener('move-right-btn', () => game.moveCat('right'));
+            addUniversalListener('flip-card-btn', () => game.flipCard());
+
+            // Math challenge
+            addUniversalListener('submit-math-btn', () => game.submitMathAnswer());
+            addUniversalListener('clear-number-btn', () => game.clearNumber());
+            addUniversalListener('cancel-peek-btn', () => game.showGame());
+
+            // Number pad
+            document.querySelectorAll('.num-btn[data-number]').forEach(btn => {
+                const handler = createUniversalHandler(() => {
+                    const number = parseInt(btn.dataset.number);
+                    game.inputNumber(number);
+                });
+                
+                btn.addEventListener('touchstart', handler.handleTouchStart, {passive: false});
+                btn.addEventListener('touchend', handler.handleTouchEnd, {passive: false});
+                btn.addEventListener('click', handler.handleClick);
+            });
+
+            // Minigame controls
+            addUniversalListener('minigame-up-btn', () => minigame.moveCat('up'));
+            addUniversalListener('minigame-down-btn', () => minigame.moveCat('down'));
+            addUniversalListener('minigame-left-btn', () => minigame.moveCat('left'));
+            addUniversalListener('minigame-right-btn', () => minigame.moveCat('right'));
+            addUniversalListener('minigame-pounce-btn', () => minigame.pounce());
+
+            // Other screens
+            addUniversalListener('play-again-btn', () => game.showTitle());
+            addUniversalListener('reset-achievements-btn', () => main.showResetConfirmation());
+            addUniversalListener('back-from-achievements-btn', () => game.showTitle());
+            
+            console.log('🎮 Universal event handlers initialized');
+        });
+
+        // Prevent default touch behaviors that interfere with game
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.game-container')) {
+                e.preventDefault();
+            }
+        }, {passive: false});
+
+        // Prevent context menu on long press
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.game-container')) {
+                e.preventDefault();
             }
         });
-    }
-});
-</script>
+
+        // Handle orientation changes
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                // Force viewport recalculation
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }, 100);
+        });
+
+    });
+    </script>
 </body>
 </html>
