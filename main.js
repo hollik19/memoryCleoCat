@@ -395,7 +395,7 @@ class Main {
         }
     }
 
-    function refreshUI() {
+    refreshUI() {
         // Force a complete UI refresh
         if (game && game.gameBoard) {
             game.updateCatPosition();
@@ -411,7 +411,7 @@ class Main {
         }
     }
 
-    function pause() {
+    pause() {
         // Pause audio
         if (audioManager) {
             audioManager.stopMusic();
@@ -434,7 +434,7 @@ class Main {
         console.log('⏸️ Game paused');
     }
 
-    function resume() {
+    resume() {
         // Resume audio based on current screen
         if (audioManager && game) {
             switch (game.currentScreen) {
@@ -466,7 +466,7 @@ class Main {
         console.log('▶️ Game resumed');
     }
 
-    function showPauseIndicator() {
+    showPauseIndicator() {
         let pauseIndicator = document.getElementById('pause-indicator');
         if (!pauseIndicator) {
             pauseIndicator = Utils.createElement('div');
@@ -496,7 +496,7 @@ class Main {
         pauseIndicator.style.display = 'block';
     }
 
-   function hidePauseIndicator() {
+    hidePauseIndicator() {
         const pauseIndicator = document.getElementById('pause-indicator');
         if (pauseIndicator) {
             pauseIndicator.style.display = 'none';
