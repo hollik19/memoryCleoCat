@@ -335,7 +335,7 @@ class Main {
         console.log('📐 Window resized, layout adjusted');
     }
 
-    repositionUI() {
+   function repositionUI() {
         // Reposition floating elements like notifications
         const notifications = document.querySelectorAll('.notification');
         notifications.forEach(notification => {
