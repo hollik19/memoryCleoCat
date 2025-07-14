@@ -251,5 +251,29 @@
     <script src="minigame.js"></script>
     <script src="game.js"></script>
     <script src="main.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startBtn = document.getElementById('start-game-btn');
+    if (startBtn) {
+        startBtn.addEventListener('click', function() {
+            document.getElementById('title-screen').style.display = 'none';
+            document.getElementById('grid-selection').style.display = 'block';
+            if (typeof audioManager !== 'undefined') {
+                audioManager.playSound('buttonClick');
+            }
+        });
+        
+        // Also try touch events for mobile
+        startBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            document.getElementById('title-screen').style.display = 'none';
+            document.getElementById('grid-selection').style.display = 'block';
+            if (typeof audioManager !== 'undefined') {
+                audioManager.playSound('buttonClick');
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>
