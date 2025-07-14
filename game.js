@@ -871,7 +871,11 @@ class Game {
     loadAchievements() {
         this.achievements = Utils.loadFromLocalStorage('achievements', {});
     }
-
+resetAchievements() {
+        this.achievements = {};
+        this.saveAchievements();
+        console.log('🗑️ All achievements reset');
+    }
     getGameStats() {
         const totalGames = this.gameStats.gameWins.player1 + this.gameStats.gameWins.player2;
         const mathAccuracy = this.gameStats.mathProblemsTotal > 0 ? 
