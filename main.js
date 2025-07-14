@@ -20,7 +20,7 @@ class Main {
         console.log('🐱 Cat Memory Game - Initializing...');
         
         // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
+        if(document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
             return;
         }
@@ -53,7 +53,7 @@ class Main {
         });
 
         // Mobile-specific error handling
-        if (Utils.isMobile()) {
+        if(Utils.isMobile()) {
             window.addEventListener('orientationchange', () => {
                 setTimeout(() => {
                     this.handleOrientationChange();
@@ -73,13 +73,13 @@ class Main {
         ];
 
         components.forEach(({ name, instance }) => {
-            if (!instance) {
+            if(!instance) {
                 throw new Error(`${name} not initialized`);
             }
         });
 
         // Additional mobile optimizations
-        if (Utils.isMobile()) {
+        if(Utils.isMobile()) {
             this.setupMobileOptimizations();
         }
 
@@ -94,15 +94,15 @@ class Main {
         Utils.requestWakeLock();
         
         // Optimize graphics for mobile
-        if (graphics) {
+        if(graphics) {
             const screenSize = Utils.getScreenSize();
-            if (screenSize.isSmall) {
+            if(screenSize.isSmall) {
                 graphics.setPerformanceMode('low');
             }
         }
         
         // Reduce audio complexity on low-end devices
-        if (audioManager && navigator.hardwareConcurrency < 4) {
+        if(audioManager && navigator.hardwareConcurrency < 4) {
             audioManager.setMusicVolume(0.2);
             audioManager.setSfxVolume(0.4);
         }
@@ -127,16 +127,16 @@ class Main {
         });
 
         // Handle connection changes
-        if ('connection' in navigator) {
+        if('connection' in navigator) {
             navigator.connection.addEventListener('change', () => {
                 this.handleConnectionChange();
             });
         }
 
         // Prevent context menu on long press for mobile
-        if (Utils.isTouchDevice()) {
+        if(Utils.isTouchDevice()) {
             document.addEventListener('contextmenu', (e) => {
-                if (e.target.closest('.game-container')) {
+                if(e.target.closest('.game-container')) {
                     e.preventDefault();
                 }
             });
@@ -156,17 +156,17 @@ class Main {
         };
 
         // Adjust performance based on device
-        if (deviceInfo.memory < 4 || deviceInfo.cores < 4) {
+        if(deviceInfo.memory < 4 || deviceInfo.cores < 4) {
             this.targetFPS = 30;
             this.frameInterval = 1000 / this.targetFPS;
             
-            if (graphics) {
+            if(graphics) {
                 graphics.setPerformanceMode('low');
             }
         }
 
         // Optimize for small screens
-        if (deviceInfo.screen.isSmall) {
+        if(deviceInfo.screen.isSmall) {
             document.body.classList.add('small-screen');
         }
 
@@ -174,16 +174,16 @@ class Main {
     }
    update(deltaTime) {
         // Update game systems
-        if (game && game.currentScreen === 'game') {
+        if(game && game.currentScreen === 'game') {
             // Game is running, all updates handled by individual systems
         }
 
-        if (minigame && minigame.isActive) {
+        if(minigame && minigame.isActive) {
             // Minigame updates are handled in its own loop
         }
 
         // Update audio system
-        if (audioManager && audioManager.isInitialized) {
+        if(audioManager && audioManager.isInitialized) {
             // Audio system maintenance if needed
         }
 
@@ -202,7 +202,7 @@ class Main {
     updatePerformanceMonitor(currentTime) {
         this.performanceMonitor.frameCount++;
         
-        if (currentTime - this.performanceMonitor.lastCheck >= 1000) {
+        if(currentTime - this.performanceMonitor.lastCheck >= 1000) {
             this.performanceMonitor.currentFPS = this.performanceMonitor.frameCount;
             this.performanceMonitor.frameCount = 0;
             this.performanceMonitor.lastCheck = currentTime;
@@ -211,7 +211,7 @@ class Main {
             this.adjustPerformance();
             
             // Debug FPS display
-            if (window.DEBUG_MODE) {
+            if(window.DEBUG_MODE) {
                 this.updateFPSDisplay();
             }
         }
@@ -221,13 +221,13 @@ class Main {
         const fps = this.performanceMonitor.currentFPS;
         
         // If FPS drops below 20, switch to low performance mode
-        if (fps < 20 && graphics && graphics.performanceMode !== 'low') {
+        if(fps < 20 && graphics && graphics.performanceMode !== 'low') {
             graphics.setPerformanceMode('low');
             console.warn('⚠️ Low FPS detected, switching to low performance mode');
         }
         
         // If FPS is consistently good and we're in low mode, try upgrading
-        if (fps > 50 && graphics && graphics.performanceMode === 'low') {
+        if(fps > 50 && graphics && graphics.performanceMode === 'low') {
             graphics.setPerformanceMode('auto');
             console.log('📈 Good FPS detected, upgrading performance mode');
         }
@@ -235,11 +235,11 @@ class Main {
 
     updateFPSDisplay() {
         const fpsDisplay = document.getElementById('fps-display');
-        if (fpsDisplay) {
+        if(fpsDisplay) {
             fpsDisplay.textContent = `FPS: ${this.performanceMonitor.currentFPS}`;
             
             // Color code FPS
-            if (this.performanceMonitor.currentFPS >= 50) {
+            if(this.performanceMonitor.currentFPS >= 50) {
                 fpsDisplay.style.color = '#00b894';
             } else if (this.performanceMonitor.currentFPS >= 30) {
                 fpsDisplay.style.color = '#fdcb6e';
@@ -253,23 +253,23 @@ class Main {
         // Update any UI elements that need real-time updates
         
         // Update connection status if available
-        if ('connection' in navigator) {
+        if('connection' in navigator) {
             this.updateConnectionStatus();
         }
         
         // Update battery status on mobile
-        if (Utils.isMobile() && 'getBattery' in navigator) {
+        if(Utils.isMobile() && 'getBattery' in navigator) {
             this.updateBatteryStatus();
         }
     }
 
     updateConnectionStatus() {
         const connection = navigator.connection;
-        if (connection && connection.effectiveType) {
+        if(connection && connection.effectiveType) {
             // Adjust features based on connection speed
-            if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+            if(connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
                 // Disable some visual effects on slow connections
-                if (graphics) {
+                if(graphics) {
                     graphics.setPerformanceMode('low');
                 }
             }
@@ -279,8 +279,8 @@ class Main {
     updateBatteryStatus() {
         navigator.getBattery().then((battery) => {
             // Reduce performance when battery is low
-            if (battery.level < 0.2 && !battery.charging) {
-                if (graphics && graphics.performanceMode !== 'low') {
+            if(battery.level < 0.2 && !battery.charging) {
+                if(graphics && graphics.performanceMode !== 'low') {
                     graphics.setPerformanceMode('low');
                     Utils.showNotification('Battery saver mode enabled', 'info', 2000);
                 }
@@ -292,8 +292,8 @@ class Main {
 
     autoSave() {
         // Auto-save game data every 30 seconds
-        if (!this.lastAutoSave || Date.now() - this.lastAutoSave > 30000) {
-            if (game) {
+        if(!this.lastAutoSave || Date.now() - this.lastAutoSave > 30000) {
+            if(game) {
                 game.saveAchievements();
                 game.saveGameToHistory();
             }
@@ -303,7 +303,7 @@ class Main {
 }
 // Main.js Part 3 - Event Handling and Responsive Design
 
-    handleResize() {
+    function handleResize() {
         // Adjust game layout for new window size
         const gameContainer = document.querySelector('.game-container');
         if (gameContainer) {
@@ -335,7 +335,7 @@ class Main {
         console.log('📐 Window resized, layout adjusted');
     }
 
-   repositionUI() {
+   function repositionUI() {
         // Reposition floating elements like notifications
         const notifications = document.querySelectorAll('.notification');
         notifications.forEach(notification => {
@@ -355,7 +355,7 @@ class Main {
         });
     }
 
-    handleVisibilityChange() {
+    function handleVisibilityChange() {
         if (document.hidden) {
             this.pause();
         } else {
@@ -363,7 +363,7 @@ class Main {
         }
     }
 
-    handleOrientationChange() {
+    function handleOrientationChange() {
         console.log('📱 Orientation changed');
         
         // Delay handling to let the browser finish the orientation change
@@ -380,7 +380,7 @@ class Main {
         }, 300);
     }
 
-    handleConnectionChange() {
+    function handleConnectionChange() {
         const connection = navigator.connection;
         if (connection) {
             console.log(`📶 Connection changed: ${connection.effectiveType}`);
