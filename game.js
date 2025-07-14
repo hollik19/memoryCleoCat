@@ -123,7 +123,6 @@ class Game {
         
         console.log('🎉 Game over');
     }
-}
 // Game.js Part 2 - Game Setup and Card Creation
 
     startGame(size) {
@@ -243,7 +242,6 @@ class Game {
         this.updateCatPosition();
         console.log('🎯 Game board rendered');
     }
-}
 // Game.js Part 3 - Cat Movement and Card Logic
 
     updateCatPosition() {
@@ -395,7 +393,6 @@ class Game {
             this.handleMismatch([index1, index2]);
         }
     }
-}
 // Game.js Part 4 - Match Handling and Math System
 
     handleMatch(cardIndices, isJokerMatch = false) {
@@ -745,7 +742,6 @@ class Game {
         
         this.displayNewAchievements();
     }
-}
 // Game.js Part 6 - Achievements and Data Management (Complete)
 
     displayNewAchievements() {
