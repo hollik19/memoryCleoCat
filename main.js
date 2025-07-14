@@ -395,7 +395,7 @@ class Main {
         }
     }
 
-    refreshUI() {
+    function refreshUI() {
         // Force a complete UI refresh
         if (game && game.gameBoard) {
             game.updateCatPosition();
