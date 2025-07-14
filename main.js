@@ -174,30 +174,6 @@ class Main {
     }
 }
 // Main.js Part 2 - Game Loop and Performance Management
-
-    startGameLoop() {
-        if (this.gameLoop) return;
-
-        this.lastFrameTime = performance.now();
-        this.performanceMonitor.lastCheck = this.lastFrameTime;
-        
-        const loop = (currentTime) => {
-            const deltaTime = currentTime - this.lastFrameTime;
-            
-            if (deltaTime >= this.frameInterval) {
-                this.update(deltaTime);
-                this.render();
-                this.updatePerformanceMonitor(currentTime);
-                this.lastFrameTime = currentTime - (deltaTime % this.frameInterval);
-            }
-            
-            this.gameLoop = requestAnimationFrame(loop);
-        };
-
-        this.gameLoop = requestAnimationFrame(loop);
-        console.log(`🔄 Game loop started at ${this.targetFPS}fps`);
-    }
-
     update(deltaTime) {
         // Update game systems
         if (game && game.currentScreen === 'game') {
