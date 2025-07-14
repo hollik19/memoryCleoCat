@@ -872,15 +872,6 @@ class Main {
         }
     }
 
-    getPerformanceMetrics() {
-        return {
-            fps: this.performanceMonitor.currentFPS,
-            frameTime: 1000 / this.performanceMonitor.currentFPS,
-            graphics: graphics ? graphics.getStatus() : null,
-            memory: performance.memory ? {
-                used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
-                total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
-                limit: Math.round(performance.memory.js
                                   // Main.js Part 6 - Final Methods and Initialization (Complete)
 
     getPerformanceMetrics() {
