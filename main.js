@@ -303,7 +303,7 @@ class Main {
 }
 // Main.js Part 3 - Event Handling and Responsive Design
 
-    handleResize() {
+    function handleResize() {
         // Adjust game layout for new window size
         const gameContainer = document.querySelector('.game-container');
         if (gameContainer) {
