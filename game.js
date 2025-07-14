@@ -61,15 +61,11 @@ showGridSelection() {
     Utils.showScreen('grid-selection');
     audioManager.playSound('buttonClick');
 }
-        
-        console.log('📐 Showing grid selection');
-    }
 
     showGame() {
         this.currentScreen = 'game';
         Utils.showScreen('game-screen');
         this.updatePeekButton();
-        console.log('🎮 Showing game screen');
     }
 
     showPeekChallenge() {
