@@ -574,7 +574,6 @@ class Game {
     clearSelectedAnswer() {
         this.clearNumber();
     }
-}
 // Game.js Part 5 - Peek System and Game End
 
     submitMathAnswer() {
