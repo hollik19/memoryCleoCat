@@ -244,11 +244,11 @@ class Utils {
     }
 
     static showScreen(screenId) {
-        this.hideAllScreens();
-        this.showElement(screenId);
+        Utils.hideAllScreens();
+        Utils.showElement(screenId);
         
         // Prevent body scroll on mobile when showing screens
-        if (this.isTouchDevice()) {
+        if (Utils.isTouchDevice()) {
             document.body.style.overflow = 'hidden';
             setTimeout(() => {
                 document.body.style.overflow = '';
